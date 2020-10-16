@@ -42,3 +42,19 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+### `npm run lint`
+
+Starts the linter.
+
+### `npm run prettify`
+
+Starts the prettier.
+
+### `npm run isready`
+
+Starts the linter and prettier, after that builds the app for production to the `build` folder.
+
+### `bash createComponent.sh`
+
+Starts a bash script to create react components.
