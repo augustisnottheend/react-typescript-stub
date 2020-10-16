@@ -1,14 +1,21 @@
-import { useState, useCallback } from 'react';
-import agent from '../agent';
-import { IError } from './types';
+import agent from 'agent';
+import { AxiosResponse } from 'axios';
+import { useState, useCallback, useEffect } from 'react';
 
-type Method = keyof typeof agent;
+interface IErrorData {
+  data: string[];
+  status: number;
+}
+export interface IError {
+  response: IErrorData;
+}
+
 type Response<R> = R | undefined;
 type ResponseError = IError | undefined;
 
-interface IProps {
-  method: Method;
-  url: string;
+interface IProps<R = any, T = any> {
+  fetch: (data: T) => Promise<AxiosResponse<R>>;
+  query?: string;
 }
 
 interface IFullResponse<R> {
@@ -17,21 +24,19 @@ interface IFullResponse<R> {
   error: ResponseError;
 }
 
-const useApiData = <R = any, T = object>(
-  props: IProps
+const useApiPost = <R = any, T = any>(
+  { fetch, query = '' }: IProps<R>,
+  deps?: any[]
 ): [IFullResponse<R>, (data?: T, params?: string) => void] => {
-  const { method, url } = props;
-
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<Response<R>>();
   const [error, setError] = useState<ResponseError>();
 
   const fetchData = useCallback(
-    async (data, params) => {
+    async (data) => {
       try {
         setIsLoading(true);
-        // types
-        const result = await agent[method](params ? url + params : url, data);
+        const result = await fetch(data);
         setResponse(result.data);
       } catch (e) {
         setError(e);
@@ -39,10 +44,14 @@ const useApiData = <R = any, T = object>(
         setIsLoading(false);
       }
     },
-    [method, url]
+    [fetch]
   );
+
+  // useEffect(() => {
+  //   if (deps?.length && deps.length > 0) fetchData();
+  // }, [deps?.length, fetchData, query]);
 
   return [{ isLoading, response, error }, fetchData];
 };
 
-export default useApiData;
+export default useApiPost;
